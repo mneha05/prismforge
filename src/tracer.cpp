@@ -118,6 +118,9 @@ void Image::writePpm(const std::string &path) const {
 
 void renderRows(const Scene &scene, const RenderConfig &config, Image &image,
                 int first_row, int row_stride) {
+#ifdef PRISMFORGE_USE_OPENMP
+#pragma omp parallel for schedule(dynamic, 1)
+#endif
   for (int y = first_row; y < config.height; y += row_stride) {
     for (int x = 0; x < config.width; ++x) {
       Vec3 accumulated;
