@@ -1,0 +1,25 @@
+name: Hybrid renderer CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  software-and-rtl:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential openmpi-bin libopenmpi-dev iverilog ghdl perl
+      - name: Build and test software core
+        run: make test mpi
+      - name: Exercise two-rank hybrid render
+        run: |
+          mpirun --oversubscribe -np 2 ./build/prismforge-mpi \
+            --width 192 --height 108 --samples 2 --threads 2 \
+            --scene scenes/neon.scene --output build/ci-render.ppm
+          test -s build/ci-render.ppm
+      - name: Generate vectors and verify both HDLs
+        run: make rtl-all

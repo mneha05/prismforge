@@ -2,3 +2,4 @@ build/
 *.ppm
 *.vcd
 work-obj*.cf
+tb_ray_sphere_discriminant

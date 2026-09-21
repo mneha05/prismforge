@@ -6,7 +6,7 @@ MPI_FLAGS := -DPRISMFORGE_USE_MPI
 SOURCES := src/main.cpp src/scene.cpp src/tracer.cpp src/parallel.cpp
 CORE_SOURCES := src/scene.cpp src/tracer.cpp
 
-.PHONY: all local mpi test generate rtl-verilog rtl-vhdl rtl-all clean
+.PHONY: all local mpi test generate rtl-verilog rtl-vhdl rtl-all ci clean
 
 all: local
 
@@ -27,20 +27,23 @@ generate: build
 	perl tools/gen_scene.pl --scene build/generated.scene \
 		--vectors build/generated_vectors.txt --count 128
 
-rtl-verilog: build
+rtl-verilog: generate
 	iverilog -g2012 -Wall -o build/ray_pipeline_tb \
 		rtl/verilog/ray_sphere_discriminant.v \
 		rtl/systemverilog/ray_packet_pipeline.sv \
 		rtl/systemverilog/tb_ray_pipeline.sv
-	vvp build/ray_pipeline_tb +VECTORS=rtl/test_vectors.txt
+	vvp build/ray_pipeline_tb +VECTORS=build/generated_vectors.txt
 
-rtl-vhdl: build
+rtl-vhdl: generate
 	ghdl -a --std=08 --workdir=build rtl/vhdl/ray_sphere_discriminant.vhd
 	ghdl -a --std=08 --workdir=build rtl/vhdl/tb_ray_sphere_discriminant.vhd
 	ghdl -e --std=08 --workdir=build -o build/vhdl_tb tb_ray_sphere_discriminant
-	ghdl -r --std=08 --workdir=build tb_ray_sphere_discriminant --assert-level=error
+	ghdl -r --std=08 --workdir=build tb_ray_sphere_discriminant \
+		-gVECTOR_PATH=build/generated_vectors.txt --assert-level=error
 
 rtl-all: rtl-verilog rtl-vhdl
+
+ci: test mpi rtl-all
 
 clean:
 	rm -rf build

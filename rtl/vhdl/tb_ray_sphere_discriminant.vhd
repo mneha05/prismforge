@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 use std.textio.all;
 
 entity tb_ray_sphere_discriminant is
+  generic (
+    VECTOR_PATH : string := "rtl/test_vectors.txt"
+  );
 end entity;
 
 architecture test of tb_ray_sphere_discriminant is
@@ -23,7 +26,7 @@ begin
     );
 
   stimulus: process
-    file vectors : text open read_mode is "rtl/test_vectors.txt";
+    file vectors : text open read_mode is VECTOR_PATH;
     variable row : line;
     variable v_ro_x, v_ro_y, v_ro_z : integer;
     variable v_rd_x, v_rd_y, v_rd_z : integer;
