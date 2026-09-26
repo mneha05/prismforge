@@ -83,6 +83,17 @@ $$\Delta = \left(oc \cdot d\right)^2 - \left(d \cdot d\right)\left(oc \cdot oc-r
 
 A hit requires $\Delta \ge 0$ and a forward intersection. Details, widths, and the exact current hardware boundary are documented in [docs/hardware.md](docs/hardware.md).
 
+
+### Verilator cycle-accurate C++ model
+
+PrismForge also compiles the same SystemVerilog pipeline into a native C++ model with Verilator:
+
+```bash
+make rtl-verilator
+```
+
+That target generates fresh fixed-point vectors, Verilates `ray_packet_pipeline.sv`, builds the generated `Vray_packet_pipeline` C++ model with a handwritten harness, clocks reset/valid/data cycle by cycle, and checks every output against the shared vectors. This is a genuinely executable C++ hardware model rather than another HDL-only testbench.
+
 ## Reproduce everything
 
 ```bash
