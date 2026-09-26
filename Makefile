@@ -45,7 +45,7 @@ rtl-verilator: generate
 	verilator -Wall --cc --exe --build --top-module ray_packet_pipeline \
 		rtl/verilog/ray_sphere_discriminant.v \
 		rtl/systemverilog/ray_packet_pipeline.sv \
-		rtl/verilator/ray_pipeline_main.cpp \
+		$(CURDIR)/rtl/verilator/ray_pipeline_main.cpp \
 		-Mdir build/obj_dir -o ray_pipeline_verilated
 	./build/obj_dir/ray_pipeline_verilated build/generated_vectors.txt
 
