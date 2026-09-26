@@ -12,7 +12,7 @@ jobs:
       - name: Install toolchains
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential openmpi-bin libopenmpi-dev iverilog ghdl perl
+          sudo apt-get install -y build-essential openmpi-bin libopenmpi-dev iverilog ghdl perl verilator
       - name: Build and test software core
         run: make test mpi
       - name: Exercise two-rank hybrid render
