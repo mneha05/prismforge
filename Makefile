@@ -6,7 +6,7 @@ MPI_FLAGS := -DPRISMFORGE_USE_MPI
 SOURCES := src/main.cpp src/scene.cpp src/tracer.cpp src/parallel.cpp
 CORE_SOURCES := src/scene.cpp src/tracer.cpp
 
-.PHONY: all local mpi test generate rtl-verilog rtl-vhdl rtl-all ci clean
+.PHONY: all local mpi test generate rtl-verilog rtl-vhdl rtl-verilator rtl-all ci clean
 
 all: local
 
@@ -41,7 +41,15 @@ rtl-vhdl: generate
 	ghdl -r --std=08 --workdir=build tb_ray_sphere_discriminant \
 		-gVECTOR_PATH=build/generated_vectors.txt --assert-level=error
 
-rtl-all: rtl-verilog rtl-vhdl
+rtl-verilator: generate
+	verilator -Wall --cc --exe --build --top-module ray_packet_pipeline \
+		rtl/verilog/ray_sphere_discriminant.v \
+		rtl/systemverilog/ray_packet_pipeline.sv \
+		rtl/verilator/ray_pipeline_main.cpp \
+		-Mdir build/obj_dir -o ray_pipeline_verilated
+	./build/obj_dir/ray_pipeline_verilated build/generated_vectors.txt
+
+rtl-all: rtl-verilog rtl-vhdl rtl-verilator
 
 ci: test mpi rtl-all
 
